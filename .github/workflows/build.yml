@@ -31,7 +31,7 @@ jobs:
 
       - name: Install Android SDK & Link to Buildozer Path
         run: |
-          # 1. ตั้งไดเรกทอรีปลายทางที่ Buildozer เรียกหาแน่นอน
+          # 1. ตั้งไดเรกทอรีปลายทางที่ Buildozer เรียกหา
           BUILDOZER_SDK_DIR="$HOME/.buildozer/android/platform/android-sdk"
           mkdir -p $BUILDOZER_SDK_DIR/cmdline-tools
           
@@ -61,6 +61,11 @@ jobs:
 
       - name: Build APK with Buildozer
         run: |
+          # เคลียร์ NDK Path ของระบบเพื่อป้องกันการชนกับ NDK r25b ของ Buildozer
+          unset ANDROID_NDK
+          unset ANDROID_NDK_HOME
+          unset ANDROID_NDK_ROOT
+          unset ANDROID_NDK_LATEST_HOME
           buildozer android debug
 
       - name: Upload APK
