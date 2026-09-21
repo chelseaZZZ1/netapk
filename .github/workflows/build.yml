@@ -27,37 +27,13 @@ jobs:
       - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y git zip unzip python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libsqlite3-dev cmake libssl-dev libffi-dev build-essential wget
+          sudo apt-get install -y git zip unzip python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libsqlite3-dev cmake libssl-dev libffi-dev build-essential ccache
 
       - name: Install Buildozer and Cython
         run: |
           pip install --upgrade pip
           pip install "cython<3.0.0"
           pip install buildozer
-
-      - name: Setup Android SDK & Fix Legacy Tools Path
-        run: |
-          # 1. กำหนดตำแหน่ง SDK ของ Buildozer
-          BUILDOZER_SDK_DIR="$HOME/.buildozer/android/platform/android-sdk"
-          mkdir -p $BUILDOZER_SDK_DIR/cmdline-tools
-          
-          # 2. ดาวน์โหลด Commandline Tools ล่าสุด
-          cd $BUILDOZER_SDK_DIR/cmdline-tools
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-          unzip -q commandlinetools-linux-9477386_latest.zip
-          mv cmdline-tools latest
-
-          # 3. ติดตั้ง build-tools และ platform-tools
-          yes | $BUILDOZER_SDK_DIR/cmdline-tools/latest/bin/sdkmanager --sdk_root=$BUILDOZER_SDK_DIR "build-tools;33.0.2" "platforms;android-33" "platform-tools"
-
-          # 4. [FIX CRITICAL] สร้าง Symlink เชื่อมพาท legacy tools/bin/sdkmanager ที่ Buildozer มองหา
-          mkdir -p $BUILDOZER_SDK_DIR/tools/bin
-          ln -s $BUILDOZER_SDK_DIR/cmdline-tools/latest/bin/sdkmanager $BUILDOZER_SDK_DIR/tools/bin/sdkmanager
-
-          # 5. ลิงก์ aidl และตั้งค่า PATH
-          echo "$BUILDOZER_SDK_DIR/build-tools/33.0.2" >> $GITHUB_PATH
-          echo "$BUILDOZER_SDK_DIR/platform-tools" >> $GITHUB_PATH
-          sudo ln -s $BUILDOZER_SDK_DIR/build-tools/33.0.2/aidl /usr/local/bin/aidl || true
 
       - name: Build APK with Buildozer
         run: |
