@@ -35,26 +35,28 @@ jobs:
           pip install "cython<3.0.0"
           pip install buildozer
 
-      - name: Pre-download Android SDK & Setup AIDL Direct Link
+      - name: Setup Android SDK & Fix Legacy Tools Path
         run: |
-          # 1. สร้างโฟลเดอร์ SDK ในตำแหน่งที่ Buildozer ใช้งานจริง
+          # 1. กำหนดตำแหน่ง SDK ของ Buildozer
           BUILDOZER_SDK_DIR="$HOME/.buildozer/android/platform/android-sdk"
           mkdir -p $BUILDOZER_SDK_DIR/cmdline-tools
           
-          # 2. โหลด commandlinetools จาก Google Direct
+          # 2. ดาวน์โหลด Commandline Tools ล่าสุด
           cd $BUILDOZER_SDK_DIR/cmdline-tools
           wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
           unzip -q commandlinetools-linux-9477386_latest.zip
           mv cmdline-tools latest
 
-          # 3. ติดตั้ง build-tools 33.0.2 และ platform-tools ลงในโฟลเดอร์ของ Buildozer โดยตรง
+          # 3. ติดตั้ง build-tools และ platform-tools
           yes | $BUILDOZER_SDK_DIR/cmdline-tools/latest/bin/sdkmanager --sdk_root=$BUILDOZER_SDK_DIR "build-tools;33.0.2" "platforms;android-33" "platform-tools"
 
-          # 4. ทำ Symbolic Link / Export PATH ให้ Ubuntu Runner และ Buildozer หา aidl เจอแน่นอน 100%
+          # 4. [FIX CRITICAL] สร้าง Symlink เชื่อมพาท legacy tools/bin/sdkmanager ที่ Buildozer มองหา
+          mkdir -p $BUILDOZER_SDK_DIR/tools/bin
+          ln -s $BUILDOZER_SDK_DIR/cmdline-tools/latest/bin/sdkmanager $BUILDOZER_SDK_DIR/tools/bin/sdkmanager
+
+          # 5. ลิงก์ aidl และตั้งค่า PATH
           echo "$BUILDOZER_SDK_DIR/build-tools/33.0.2" >> $GITHUB_PATH
           echo "$BUILDOZER_SDK_DIR/platform-tools" >> $GITHUB_PATH
-          
-          # กันเหนียว: ลิงก์ aidl ไปไว้ที่ /usr/local/bin ของระบบ Linux
           sudo ln -s $BUILDOZER_SDK_DIR/build-tools/33.0.2/aidl /usr/local/bin/aidl || true
 
       - name: Build APK with Buildozer
