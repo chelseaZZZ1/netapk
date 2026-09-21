@@ -9,6 +9,9 @@ package.name = ffnetcutter
 # (str) Package domain (needed for android packaging)
 package.domain = org.netcutter
 
+# (str) Application version
+version = 0.1
+
 # (str) Source files where the include (let it be empty to include all files)
 source.dir = .
 
@@ -16,7 +19,6 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
 
 # (list) Application requirements
-# comma separated e.g. requirements = sqlite3,kivy
 requirements = python3,kivy
 
 # (str) Supported orientations
@@ -48,9 +50,6 @@ android.skip_update = False
 
 # (bool) Indicate whether the application should be fullscreen or not
 fullscreen = 0
-
-# (string) Presplash background color
-# android.presplash_color = #FFFFFF
 
 [buildozer]
 
