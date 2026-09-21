@@ -5,6 +5,9 @@ title = FF NetCutter
 package.name = ffnetcutter
 package.domain = org.netcutter
 
+# (version of your application)
+version = 0.1
+
 # (source code location)
 source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
