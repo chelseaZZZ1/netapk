@@ -1,40 +1,23 @@
-name: Build Android APK
+[app]
 
-on:
-  push:
-    branches: [ main, master ]
-  workflow_dispatch:
+# (package name and title)
+title = FF NetCutter
+package.name = ffnetcutter
+package.domain = org.netcutter
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+# (source code location)
+source.dir = .
+source.include_exts = py,png,jpg,kv,atlas
 
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+# (app requirements)
+requirements = python3,kivy
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
+# (android orientation)
+orientation = portrait
 
-      - name: Install System Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libsqlite3-dev cmake libssl-dev libffi-dev
+# (permissions)
+android.permissions = INTERNET,ACCESS_NETWORK_STATE,CHANGE_NETWORK_STATE,SYSTEM_ALERT_WINDOW
 
-      - name: Install Buildozer and Cython
-        run: |
-          pip install --upgrade pip
-          pip install "cython<3.0.0"
-          pip install buildozer
-
-      - name: Build APK with Buildozer
-        run: |
-          buildozer android debug
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: ff-netcutter-apk
-          path: bin/*.apk
+# (android API levels)
+android.api = 33
+android.minapi = 21
