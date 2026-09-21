@@ -27,7 +27,31 @@ jobs:
       - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y git zip unzip python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libsqlite3-dev cmake libssl-dev libffi-dev build-essential ccache
+          sudo apt-get install -y git zip unzip python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libsqlite3-dev cmake libssl-dev libffi-dev build-essential ccache wget
+
+      - name: Install Android SDK & AIDL
+        run: |
+          # 1. ตั้งไดเรกทอรี Android SDK
+          export ANDROID_HOME=$HOME/android-sdk
+          mkdir -p $ANDROID_HOME/cmdline-tools
+          
+          # 2. โหลด Command Line Tools
+          cd $ANDROID_HOME/cmdline-tools
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+          unzip -q commandlinetools-linux-9477386_latest.zip
+          mv cmdline-tools latest
+
+          # 3. ติดตั้ง build-tools ที่มี aidl และกดยอมรับ license
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME "build-tools;33.0.2" "platforms;android-33" "platform-tools"
+
+          # 4. ตั้ง PATH และ Environment Variables ให้ระบบรวมถึง Buildozer มองเห็น aidl
+          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "$ANDROID_HOME/build-tools/33.0.2" >> $GITHUB_PATH
+          echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
+          
+          # 5. ลิงก์ aidl เข้า /usr/local/bin เพื่อให้เรียกใช้งานระดับระบบได้ชัวร์
+          sudo ln -s $ANDROID_HOME/build-tools/33.0.2/aidl /usr/local/bin/aidl || true
 
       - name: Install Buildozer and Cython
         run: |
