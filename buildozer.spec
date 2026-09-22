@@ -1,32 +1,31 @@
 [app]
-
-title = FF NetCutter
-
+# ชื่อแอปพลิเคชันและ Package
+title = FF Netcutter
 package.name = ffnetcutter
-package.domain = org.netcutter
+package.domain = org.test
 
-version = 0.1
-
+# ซอร์สโค้ดหลัก
 source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
 
+# เวอร์ชันแอป
+version = 0.1
+
+# ไลบรารีที่ต้องใช้ (ปรับตามที่โปรเจกต์คุณใช้จริง)
 requirements = python3,kivy
 
-orientation = portrait
+# -----------------------------------------------------------------------------
+# Android configuration (จุดสำคัญมาก)
+# -----------------------------------------------------------------------------
 
-android.permissions = INTERNET,ACCESS_NETWORK_STATE,CHANGE_NETWORK_STATE,SYSTEM_ALERT_WINDOW
+# บังคับยอมรับ SDK License อัตโนมัติ (ห้ามลืมเปิดเป็น True)
+android.accept_sdk_license = True
 
-android.archs = arm64-v8a
-
+# ตั้งค่า API และ Architecture
 android.api = 33
 android.minapi = 21
 android.ndk = 25b
+android.archs = arm64-v8a, armeabi-v7a
 
-android.skip_update = False
-
-fullscreen = 0
-
-[buildozer]
-
-log_level = 2
-warn_on_root = 0
+# Orientation
+orientation = portrait
