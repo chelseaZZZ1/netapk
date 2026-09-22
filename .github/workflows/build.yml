@@ -2,9 +2,7 @@ name: Build Android APK
 
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
@@ -12,23 +10,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      # Step 1: ดึงโค้ดจาก Repository ลง Runner
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - name: Build APK
+      # Step 2: บังคับ Override Entrypoint แล้วรัน Buildozer ใน Docker
+      - name: Build APK using Official Kivy Buildozer Docker Image
         run: |
           docker run --rm \
-            -v ${{ github.workspace }}:/home/user/hostcwd \
+            -v ${{ github.workspace }}:/home/user/hostpython \
             -e BUILDOZER_ALLOW_ROOT=1 \
+            --entrypoint /bin/bash \
             kivy/buildozer \
-            android update
+            -c "buildozer --allow-root android debug"
 
-          docker run --rm \
-            -v ${{ github.workspace }}:/home/user/hostcwd \
-            -e BUILDOZER_ALLOW_ROOT=1 \
-            kivy/buildozer \
-            android debug
+      # Step 3: แก้ไข Permission ของไฟล์ทั้งหมดคืนให้ User ของ Runner
+      - name: Fix file permissions for Runner
+        if: always()
+        run: sudo chown -R $USER:$USER .
 
-      - name: Upload APK
+      # Step 4: อัปโหลดไฟล์ APK ขึ้นระบบ GitHub Artifacts
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ff-netcutter-apk
