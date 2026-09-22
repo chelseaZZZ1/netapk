@@ -14,13 +14,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Step 2: ตั้งค่า Python 3.12 (หลีกเลี่ยง Python 3.14 พัง)
+      # Step 2: ตั้งค่า Python 3.12 (ล็อกเวอร์ชันป้องกัน Python 3.14)
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
-      # Step 3: ติดตั้ง System Dependencies สำคัญสำหรับ Android NDK/SDK
+      # Step 3: ติดตั้ง System Dependencies บน Ubuntu 24.04
       - name: Install System Dependencies
         run: |
           sudo apt-get update
@@ -28,10 +28,10 @@ jobs:
             build-essential \
             git \
             ffmpeg \
-            libcreator-dev \
+            libffi-dev \
             libsdl2-dev \
             libsdl2-image-dev \
-            libsdl2-mixin-dev \
+            libsdl2-mixer-dev \
             libsdl2-ttf-dev \
             libportmidi-dev \
             libswscale-dev \
@@ -43,19 +43,19 @@ jobs:
             unzip \
             ccache
 
-      # Step 4: ล็อกเวอร์ชัน Pip, Setuptools, Cython และ Buildozer/p4a ที่ทำงานเข้ากันได้ 100%
+      # Step 4: ติดตั้งและล็อกเวอร์ชัน Toolchain สำคัญ
       - name: Install Buildozer and Pin Toolchain Dependencies
         run: |
           python -m pip install --upgrade "pip<25" "setuptools<70" wheel
           python -m pip install "cython<3" "python-for-android==2024.7.2" "buildozer==1.5.0"
 
-      # Step 5: สั่งบิลด์ APK (ไม่ต้องใช้ Docker และไม่ต้องสู้กับปัญหา Root)
+      # Step 5: บิลด์ APK ด้วย Buildozer
       - name: Build APK with Buildozer
         run: |
           rm -rf .buildozer
           buildozer android debug
 
-      # Step 6: Upload APK Artifact ขึ้น GitHub
+      # Step 6: Upload APK Artifact
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
