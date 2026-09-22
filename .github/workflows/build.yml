@@ -10,20 +10,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout โค้ดลง Runner
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # Step 2: Override Entrypoint เพื่อรัน buildozer --allow-root ผ่าน Bash ตรงๆ
       - name: Build APK using Official Kivy Buildozer Docker Image
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/home/user/hostpython \
+            --entrypoint /bin/bash \
             kivy/buildozer \
-            android debug --allow-root
+            -c "buildozer --allow-root android debug"
 
+      # Step 3: แก้ไข Permission ไฟล์ในโฟลเดอร์ให้เป็นของ Runner
       - name: Fix permissions for uploaded artifacts
         if: always()
         run: sudo chown -R $USER:$USER .
 
+      # Step 4: Upload ไฟล์ APK ขึ้น GitHub Artifacts
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
