@@ -18,7 +18,11 @@ jobs:
           docker run --rm \
             -v ${{ github.workspace }}:/home/user/hostpython \
             kivy/buildozer \
-            --allow-root android debug
+            android debug --allow-root
+
+      - name: Fix permissions for uploaded artifacts
+        if: always()
+        run: sudo chown -R $USER:$USER .
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
