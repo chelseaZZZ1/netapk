@@ -10,27 +10,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: ดึงโค้ดโปรเจกต์เข้ามาที่ Runner
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Step 2: รัน Buildozer โดยระบุ Working Directory (-w) เข้าไปหา buildozer.spec
-      - name: Build APK using Official Kivy Buildozer Docker Image
+      - name: Build APK using stable Buildozer image
         run: |
           docker run --rm \
-            -v ${{ github.workspace }}:/home/user/hostpython \
+            -v "${{ github.workspace }}:/home/user/hostpython" \
             -w /home/user/hostpython \
             -e BUILDOZER_WARN_ON_ROOT=0 \
             --entrypoint /bin/bash \
-            kivy/buildozer \
-            -c "yes | buildozer --allow-root android debug"
+            kivy/buildozer:stable \
+            -c "rm -rf .buildozer && yes | buildozer --allow-root android debug"
 
-      # Step 3: เปลี่ยน Owner ของไฟล์ทั้งหมดคืนเป็น User หลักของ Runner
-      - name: Fix file permissions for Runner
+      - name: Fix file permissions
         if: always()
-        run: sudo chown -R $USER:$USER .
+        run: sudo chown -R "$USER:$USER" .
 
-      # Step 4: อัปโหลดไฟล์ APK ที่บิลด์สำเร็จขึ้น GitHub Artifacts
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
