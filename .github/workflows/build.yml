@@ -13,11 +13,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Build with Buildozer Action
-        uses: ArtemSydoryk/buildozer-action@v1.2
+      - name: Build APK with Buildozer Action
+        uses: JoshLmao/buildozer-action@v1.5.0
         with:
           command: buildozer android debug
-          buildozer_version: master
+          buildozer_version: stable
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
