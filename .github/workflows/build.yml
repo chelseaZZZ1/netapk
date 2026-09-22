@@ -10,23 +10,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout โค้ดลง Runner
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Build APK using stable Buildozer image
+      # Step 2: แก้ไขปัญหา Pip 3.14 ใน Docker Container แล้วรัน Buildozer
+      - name: Build APK using Official Kivy Buildozer Image
         run: |
           docker run --rm \
             -v "${{ github.workspace }}:/home/user/hostpython" \
             -w /home/user/hostpython \
             -e BUILDOZER_WARN_ON_ROOT=0 \
             --entrypoint /bin/bash \
-            kivy/buildozer:stable \
-            -c "rm -rf .buildozer && yes | buildozer --allow-root android debug"
+            kivy/buildozer:latest \
+            -c "
+              rm -rf .buildozer &&
+              /home/user/.venv/bin/python -m pip install --upgrade 'pip<25' 'python-for-android' &&
+              yes | buildozer --allow-root android debug
+            "
 
+      # Step 3: ปรับเปลี่ยน Permissions ไฟล์คืนให้ Runner
       - name: Fix file permissions
         if: always()
         run: sudo chown -R "$USER:$USER" .
 
+      # Step 4: Upload ไฟล์ APK ขึ้น Artifacts
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
